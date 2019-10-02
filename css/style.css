@@ -1,0 +1,227 @@
+body {
+  margin: 0;
+  margin-bottom: 20px;
+  padding: 0;
+  color: #747474;
+  font-family: Arial, Helvetica, sans-serif;
+}
+input,select {
+  color: #747474;
+}
+select {
+  text-align-last: center;
+}
+
+#header h1 {
+  padding: 10px;
+  border: 1px solid #ccc;
+  width: 100%;
+  text-align: center;
+  box-shadow: inset -7px 7px 20px -11px #bababa;
+  -webkit-box-shadow: inset -7px 7px 20px -11px #bababa;
+  -moz-box-shadow: inset -7px 7px 20px -11px #bababa;
+}
+
+.left-col {
+  flex-basis: 50%;
+  border: 1px solid #ccc;
+}
+.center-col {
+  flex-basis: 25%;
+  margin: 0 15px;
+}
+.center-col .row {
+  border: 1px solid #ccc;
+}
+.center-col .row:last-child {
+  margin-bottom: 0;
+}
+.right-col {
+  flex-basis: 25%;
+  border: 1px solid #ccc;
+}
+.content-col {
+  display: flex;
+  flex-direction: row;
+}
+.content-col-right,.content-col-left {
+  display: flex;
+  flex-direction: column;
+}
+.content-col-left {
+  flex-basis: 55%;
+}
+.content-col-right {
+  padding-top: 140px;
+  flex-basis: 45%;
+}
+.field {
+  display: flex;
+  align-items: center;
+  margin: 10px 0;
+}
+.field .field-name {
+  flex-basis: 60%;
+  font-size: 14px;
+  margin-right: 5px;
+}
+.field .field-value {
+  text-align: center;
+  overflow: hidden;
+  margin-right: 5px;
+  font-size: 15px;
+  line-height: 20px;
+  background: #fff;
+  flex-basis: 25%;
+  padding: 2px 5px;
+}
+
+.field select.field-value, .field input.field-value {
+  padding: 5px 5px;
+  width: 70px;
+}
+.field select.field-value {
+  min-width: 72px;
+}
+.field input.field-value {
+  border: 1px solid #ccc;
+}
+
+.field input[readOnly].field-value {
+  background: #eee;
+}
+
+.field .unit {
+  flex-basis: 15%;
+}
+.field .can-edit {
+  background: #f3f3f3;
+  box-shadow: inset 0px 2px 6px 0px #bababa;
+  -moz-box-shadow: inset 0px 2px 6px 0px #bababa;
+  -webkit-box-shadow: inset 0px 2px 6px 0px #bababa;
+}
+.row {
+  margin-bottom: 15px;
+  padding: 10px;
+}
+.right-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.result {
+  text-align: center;
+  padding-bottom: 158px;
+}
+.title {
+  margin: 0;
+  color: #a1ce5c;
+  margin-bottom: 40px;
+}
+#f34 {
+  border: 1px solid #ccc;
+  margin: 20px 15px 0;
+  padding: 10px;
+ background: #f3f3f3;
+}
+
+
+/* The container */
+.custom-checkbox {
+  display: block;
+  position: relative;
+  padding-left: 35px;
+  cursor: pointer;
+  font-size: 22px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  margin: -13px 0 13px -13px;
+}
+
+/* Hide the browser's default checkbox */
+.custom-checkbox input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+/* Create a custom checkbox */
+.checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 25px;
+  width: 25px;
+  background-color: #f3f3f3;
+  border: 1px solid #ccc;
+}
+
+/* On mouse-over, add a grey background color */
+.custom-checkbox:hover input ~ .checkmark {
+  background-color: #f3f3f3;
+}
+
+/* When the checkbox is checked, add a blue background */
+.custom-checkbox input:checked ~ .checkmark {
+  background-color: #f3f3f3;
+}
+
+/* Create the checkmark/indicator (hidden when not checked) */
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+/* Show the checkmark when checked */
+.custom-checkbox input:checked ~ .checkmark:after {
+  display: block;
+}
+
+/* Style the checkmark/indicator */
+.custom-checkbox .checkmark:after {
+  left: 9px;
+  top: 5px;
+  width: 5px;
+  height: 10px;
+  border: solid #747474;
+  border-width: 0 3px 3px 0;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
+}
+@media screen and (min-width: 1200px) {
+  .container {
+    max-width: 1170px;
+    margin: 0 auto;
+    width: 100%;
+    display: flex;
+    flex-wrap: nowrap;
+  }
+}
+@media screen and (max-width: 1200px) {
+  .center-col {
+    margin: 10px 0;
+  }
+  body {
+    margin: 0 20px;
+  }
+  #header h1 {
+    width: auto;
+  }
+}
+@media screen and (max-width: 475px) {
+  .content-col {
+    flex-direction: column;
+  }
+  .content-col-right{
+    padding-top: 0;
+  }
+  .content-col-right .field:last-child {
+    margin-top: 15px;
+  }
+}
