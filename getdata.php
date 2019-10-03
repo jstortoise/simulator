@@ -17,6 +17,12 @@
 			echo json_encode(array('fieldid'=>'f' . $fieldvalue));
 		}
 	}
+	else if(isset($_POST['action']) && $_POST['action'] == 'getformular')
+	{
+		$fieldid = $_POST['fieldid'];
+		$result_data = mysqli_query($db,'Select * from formulas where field_id = "' . $fieldid . '"');
+		echo json_encode(mysqli_fetch_array($result_data));
+	}
 	else
 	{
 		$id = $_POST['edit_id'];

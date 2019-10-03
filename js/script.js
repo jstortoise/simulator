@@ -179,6 +179,57 @@ $(document).ready(function() {
     
   })
 
+  $(document).on('click','.editformula',function(){
+    var fieldid = $(this).attr('attr_id');
+    $('.save_formula').attr('fieldid',fieldid);
+
+    $.ajax({
+      url:'getdata.php',
+      type:'POST',
+      data:{action:'getformular',fieldid:fieldid},
+      success:function(res){
+        if(res)
+        {
+          res = JSON.parse(res);
+          if(res && res.formula)
+          {
+            $('.formula_desc').val(res.formula);
+          }  
+          else
+          {
+            $('.formula_desc').val("");
+          }
+        }
+        else
+        {
+          $('.formula_desc').val("");
+        }
+
+         $('#formula').modal('show');
+        
+      }
+    })
+  })
+
+  $('.save_formula').click(function(){
+    var fieldid = $(this).attr('fieldid');
+    var formula = $('.formula_desc').val();
+
+    $.ajax({
+      url:'editsave.php',
+      type:'POST',
+      data:{action:'updateformula',field_id:fieldid,formula:formula},
+      success:function(res)
+      {
+        res = JSON.parse(res);
+        if(res.success)
+        {
+          $('#formula').modal('hide');
+        }
+      }
+    })
+  })
+
   $('.delete').click(function(){
     var id = $(this).attr('attr_id');
     $('.delete_save').attr('attr_id',id);
