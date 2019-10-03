@@ -44,6 +44,8 @@
                             <th>Value</th>
                             <th>Unit</th>
                             <th>Type</th>
+                            <th>Editable</th>
+                            <th>NEW</th>
                             <th>Description</th>
                             <th>Formula</th>
                             <th>Actions</th>
@@ -59,6 +61,8 @@
                             <td><?php echo $row['value'];?></td>
                             <td><?php echo $row['unit'];?></td>
                             <td><?php echo $row['type'] ? 'Dropdown' : 'Input';?></td>
+                            <td><?php echo $row['editable'] ? 'YES' : 'NO';?></td>
+                            <td><?php echo $row['new_field'] ? 'YES' : 'NO';?></td>
                             <td><?php echo $row['description'];?></td>
                             <td><?php echo $row['formula'];?></td>
                             <td>
@@ -159,6 +163,15 @@
                         <div class="col-md-5"> <select class="form-control fieldtype">
                                 <option value="0">Input</option>
                                 <option value="1">DropDown</option>
+                            </select> </div>
+                        <div class="col-md-3"></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-2"></div>
+                        <div class="col-md-2" style="margin-top: 7px"> Editable</div>
+                        <div class="col-md-5"> <select class="form-control fieldeditable">
+                                <option value="1">YES</option>
+                                <option value="0">NO</option>
                             </select> </div>
                         <div class="col-md-3"></div>
                     </div>

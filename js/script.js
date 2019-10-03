@@ -5,6 +5,7 @@ $(function () {
 		});
 
 		$('.fieldtype').val('0');
+		$('.fieldeditable').val('0');
 		$('.add_value_box').css('display', 'none');
 		$('.value_container').css('display', 'none');
 	}
@@ -54,6 +55,7 @@ $(function () {
 
 		name = $('.name_edit').val();
 		type = $('.fieldtype').val();
+		editable = $('.fieldeditable').val();
 		unit = $('.unit_edit').val();
 		description = $('.description_edit').val();
 		value = "";
@@ -71,7 +73,18 @@ $(function () {
 		$.ajax({
 			url: 'editsave.php',
 			type: 'POST',
-			data: { action: action, data: { field_label: name, field_id: fieldid, unit: unit, type: type, description: description, value: value } },
+			data: {
+				action: action,
+				data: {
+					field_label: name,
+					field_id: fieldid,
+					unit: unit,
+					type: type,
+					editable: editable,
+					description: description,
+					value: value
+				}
+			},
 			success: function (res) {
 				res = JSON.parse(res);
 				if (res.success) {
@@ -127,6 +140,7 @@ $(function () {
 				$('.name_edit').val(data.field_label);
 				$('.unit_edit').val(data.unit);
 				$('.fieldtype').val(data.type);
+				$('.fieldeditable').val(data.editable);
 				$('.description_edit').val(data.description);
 
 				if (data.type == '0') {

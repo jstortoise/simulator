@@ -1,45 +1,52 @@
 <?php
     include('session.php');
+
     if ($login_role == 0) {
         header("location:admin.php");
         die();
     }
-    $ses_sql = mysqli_query($db, "select * from fields");
+
+    $field_sql = mysqli_query($db, "SELECT * FROM fields");
     $fields = array();
-    while ($row = mysqli_fetch_array($ses_sql, MYSQLI_ASSOC)) {
+    while ($row = mysqli_fetch_array($field_sql, MYSQLI_ASSOC)) {
         $fields[$row['field_id']] = $row;
     }
 
-    function display($field)
-    {
-        echo '<div class="field">
-                    <span class="field-name">'
-                        .$field['field_label'] .
-                        '<div class="hover">
-                            <i class="fa fa-info-circle tooltip"></i>
-                            <div class="tooltipcontainer">' .  $field['description'] . '</div>
-                        </div>
-                    </span>';
+    function display($field) {
+        echo '
+            <div class="field">
+                <span class="field-name">'
+                    .$field['field_label'] .
+                    '<div class="hover">
+                        <i class="fa fa-info-circle tooltip"></i>
+                        <div class="tooltipcontainer">' .  $field['description'] . '</div>
+                    </div>
+                </span>';
 
-                    $editable = $field['editable']?'readonly':'';
+        $editable = $field['editable'] ? '' : 'readonly';
 
-                    if(!$field['type'])
-                    {
-                        echo '<input class="field-value" type="number" id="' . $field['field_id']  . '" value="' . $field['value'] . '"' . $editable . '>';
-                    }
-                    else
-                    {
-                        $valuearray = preg_split('/,/',$field['value']);
-                        echo '<select id="' . $field['field_id'] . '" class="field-value">';
-                        foreach ($valuearray as $key => $value) {
-                            echo '<option value="' . $value . '">' . $value . '</option>';
-                        }
-                            
-                        echo '</select>';
-                    }
+        if (!$field['type']) {
+            echo '<input class="field-value" type="number" id="' . $field['field_id']  . '" value="' . $field['value'] . '"' . $editable . '>';
+        } else {
+            $valuearray = preg_split('/,/', $field['value']);
+            echo '<select id="' . $field['field_id'] . '" class="field-value">';
+            foreach ($valuearray as $key => $value) {
+                echo '<option value="' . $value . '">' . $value . '</option>';
+            }
+                
+            echo '</select>';
+        }
 
-                    echo '<span class="unit">' . $field['unit'] . '</span>
-                </div>';
+        echo '<span class="unit">' . $field['unit'] . '</span>
+            </div>';
+    }
+
+    function showNewFields($fields) {
+        foreach ($fields as $key => $values) {
+            if ($values['new_field'] == 1) {
+                display($values);
+            }
+        }
     }
 ?>
 
@@ -53,7 +60,7 @@
             <h1>This is Sample of Salary simulator. If you use this simulator you can know your state…</h1>
         </div>
     </section>
-    
+
     <section id="content">
         <div class="container">
             <div class="left-col">
@@ -90,13 +97,18 @@
                                     <span class="checkmark"></span>
                                 </label>
                             </div>
-                           <?php display($fields['f32']);?>
+                            <?php display($fields['f32']);?>
                         </div>
                         <div class="content-col-right">
                             <?php display($fields['f19']);?>
                             <?php display($fields['f21']);?>
                         </div>
                     </div>
+                </div>
+                
+                <div class="row">
+                    <h2 class="title">Additional Fields</h2>
+                    <?php showNewFields($fields);?>
                 </div>
             </div>
             <div class="center-col">
@@ -143,7 +155,7 @@
                             d'augmentation</p>
                     </div>
                 </div>
-                
+
                 <input type="hidden" id="f24" value="<?php echo $fields['f24'];?>" readonly />
                 <input type="hidden" id="f27" value="<?php echo $fields['f27'];?>" readonly />
             </div>
