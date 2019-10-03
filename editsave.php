@@ -33,6 +33,36 @@
     	$result = mysqli_query($db,'update fields set ' . join(',',$update) . ' where field_id = "' . $data['field_id'] . '"');
     	echo json_encode(array('success'=>true));
     }
+    else if($_POST['action'] == 'updateformula')
+    {
+    	$fieldid = $_POST['field_id'];
+    	$value = $_POST['formula'];
+
+    	$query = mysqli_query($db,'Select * from formulas where field_id = "' . $fieldid . '"');
+    	$result = mysqli_fetch_array($query);
+
+    	if(!$value)
+    	{
+    		mysqli_query($db,'Delete from formulas where field_id = "' . $fieldid . '"');
+    		echo json_encode(array('success'=>true));
+    	}
+    	else
+    	{
+    		if($result)
+	    	{
+	    		mysqli_query($db,'update formulas set formula="' . $value . '" where field_id = "' . $fieldid . '"');
+	    	}
+	    	else
+	    	{
+	    		mysqli_query($db,'insert into formulas(field_id,formula) Values("' . $fieldid . '","' . $value . '")');
+	    	}
+
+	    	echo json_encode(array('success'=>true));
+    	}
+    	
+
+    	
+    }
     else 
     {
     	$data = $_POST['data'];

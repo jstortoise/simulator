@@ -1,5 +1,4 @@
-$(document).ready(function () {
-
+$(function () {
 	function init() {
 		$('#medit').find('input').each(function () {
 			$(this).val('');
@@ -43,7 +42,7 @@ $(document).ready(function () {
 		}
 
 		$('.value_edit').val('');
-	});
+	})
 
 	$('.change').click(function () {
 		var fieldid = $(this).attr('attr_id');
@@ -64,7 +63,7 @@ $(document).ready(function () {
 			value = [];
 			$('.value_container').find('.item').each(function () {
 				value.push($(this).attr('itemvalue'));
-			})
+			});
 
 			value = value.join(',');
 		}
@@ -142,6 +141,48 @@ $(document).ready(function () {
 
 				$('.change').attr('attr_id', data.field_id);
 				$('#medit').modal('show');
+			}
+		});
+	});
+
+	$(document).on('click', '.editformula', function () {
+		var fieldid = $(this).attr('attr_id');
+		$('.save_formula').attr('fieldid', fieldid);
+
+		$.ajax({
+			url: 'getdata.php',
+			type: 'POST',
+			data: { action: 'getformular', fieldid: fieldid },
+			success: function (res) {
+				if (res) {
+					res = JSON.parse(res);
+					if (res && res.formula) {
+						$('.formula_desc').val(res.formula);
+					} else {
+						$('.formula_desc').val("");
+					}
+				} else {
+					$('.formula_desc').val("");
+				}
+
+				$('#formula').modal('show');
+			}
+		});
+	});
+
+	$('.save_formula').click(function () {
+		var fieldid = $(this).attr('fieldid');
+		var formula = $('.formula_desc').val();
+
+		$.ajax({
+			url: 'editsave.php',
+			type: 'POST',
+			data: { action: 'updateformula', field_id: fieldid, formula: formula },
+			success: function (res) {
+				res = JSON.parse(res);
+				if (res.success) {
+					$('#formula').modal('hide');
+				}
 			}
 		});
 	});

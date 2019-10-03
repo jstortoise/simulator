@@ -48,6 +48,7 @@
                                 <th style="text-align: center;"> Type </th>
                                 <th style="text-align: center;"> Description </th>
                                 <th style="text-align: center;"> Edit </th>
+                                <th style="text-align: center;">Formula</th>
                                 <th style="text-align: center;"> Delete </th>
                             </tr>
                         </thead>
@@ -63,8 +64,8 @@
                                 <td class="center"> <?php echo $row['unit'];?> </td>
                                 <td class="center"> <?php echo $row['type']?'Dropdown':'Input';?> </td>
                                 <td class="center"> <?php echo $row['description'];?> </td>
-                                <td style="text-align: center;"><a class="btn btn-primary medit" class="edit_dialog"
-                                        attr_id="<?php echo $row['id'];?>"> Edit <i class="fa fa-plus"></i></a> </td>
+                                <td style="text-align: center;"><a class="btn btn-primary medit" class="edit_dialog" attr_id = "<?php echo $row['id'];?>"> Edit <i class="fa fa-plus"></i></a> </td>
+                                <td style="text-align: center;"><a class="btn btn-success editformula"attr_id = "<?php echo $row['field_id'];?>"> Edit Formula <i class="fa fa-edit"></i></a> </td>
                                 <td style="text-align: center;">
                                     <?php if(!$row['defaultfield']){?>
                                     <a class="btn grey delete" attr_id="<?php echo $row['id'];?>" data-toggle="modal"
@@ -82,52 +83,24 @@
             </div>
         </div>
     </div>
-    <!-- Add New start -->
-    <div class="modal fade" id="maddnew" tabindex="-1" role="basic" aria-hidden="true">
+<!-- Add New start -->
+    <div class="modal fade" id="formula" tabindex="-1" role="basic" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
-                    <h4 class="modal-title">Add New</h4>
+                    <h4 class="modal-title">Edit Formula</h4>
                 </div>
                 <div class="modal-body">
                     <div class="row">
-                        <div class="col-md-2"></div>
-                        <div class="col-md-2" style="margin-top: 7px"> Name</div>
-                        <div class="col-md-5"> <input type="text" class="form-control name_add" name=""> </div>
-                        <div class="col-md-3"></div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-2"></div>
-                        <div class="col-md-2" style="margin-top: 7px"> Value</div>
-                        <div class="col-md-5"> <input type="text" class="form-control value_add" name=""> </div>
-                        <div class="col-md-3"></div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-2"></div>
-                        <div class="col-md-2" style="margin-top: 7px"> Unit</div>
-                        <div class="col-md-5"> <input type="text" class="form-control unit_add" name=""> </div>
-                        <div class="col-md-3"></div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-2"></div>
-                        <div class="col-md-2" style="margin-top: 7px"> Type</div>
-                        <div class="col-md-5"> <select class="form-control type_add">
-                                <option value="0">Input</option>
-                                <option value="1">Dropdown</option>
-                            </select></div>
-                        <div class="col-md-3"></div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-2"></div>
-                        <div class="col-md-2" style="margin-top: 7px"> Description</div>
-                        <div class="col-md-5"> <textarea class="form-control description_add"></textarea> </div>
-                        <div class="col-md-3"></div>
+                        <div class="col-md-12">
+                            <input type="text" class="formula_desc form-control"/>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn dark btn-outline" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn green save_add">Save</button>
+                    <button type="button" class="btn green save_formula">Save</button>
                 </div>
             </div>
         </div>
@@ -198,7 +171,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn dark btn-outline" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn green change">Chang</button>
+                    <button type="button" class="btn green change">Save</button>
                 </div>
             </div>
         </div>
