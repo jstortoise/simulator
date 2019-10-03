@@ -16,9 +16,7 @@
         }
         echo "Successfully updated";
     }
-    $ses_sql = mysqli_query($db, "select * from fields order by field_id desc");
-
-    $formula_sql = mysqli_query($db, "select * from formulas order by field_id desc");
+    $field_list = mysqli_query($db, "SELECT a.*, b.formula FROM fields a LEFT JOIN formulas b ON a.field_id = b.field_id ORDER BY field_id DESC");
 
 ?>
 
@@ -30,59 +28,61 @@
     <section>
         <h1>Admin Panel</h1>
     </section>
-    <div class="row">
-        <div class="col-md-12">
-            <div class="portlet light bordered">
-                <div class="portlet-body">
-                    <div class="btn-group">
-                        <a class="btn sbold green add_new"> Add New <i class="fa fa-plus"></i></a>
-                    </div>
-                    <table class="table table-striped table-bordered table-hover table-checkable order-column"
-                        id="field_list">
-                        <thead>
-                            <tr>
-                                <th> Field Id </th>
-                                <th style="text-align: center;"> Name </th>
-                                <th style="text-align: center;"> Value </th>
-                                <th style="text-align: center;"> Unit </th>
-                                <th style="text-align: center;"> Type </th>
-                                <th style="text-align: center;"> Description </th>
-                                <th style="text-align: center;"> Edit </th>
-                                <th style="text-align: center;">Formula</th>
-                                <th style="text-align: center;"> Delete </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php
-                                while ($row = mysqli_fetch_array($ses_sql, MYSQLI_ASSOC)) {
-                                    // if ($row['type'] == 0) {
-                            ?>
-                            <tr class="odd gradeX">
-                                <td> <?php echo $row['field_id'];?> </td>
-                                <td> <?php echo $row['field_label'];?> </td>
-                                <td><?php echo $row['value'];?></td>
-                                <td class="center"> <?php echo $row['unit'];?> </td>
-                                <td class="center"> <?php echo $row['type']?'Dropdown':'Input';?> </td>
-                                <td class="center"> <?php echo $row['description'];?> </td>
-                                <td style="text-align: center;"><a class="btn btn-primary medit" class="edit_dialog" attr_id = "<?php echo $row['id'];?>"> Edit <i class="fa fa-plus"></i></a> </td>
-                                <td style="text-align: center;"><a class="btn btn-success editformula"attr_id = "<?php echo $row['field_id'];?>"> Edit Formula <i class="fa fa-edit"></i></a> </td>
-                                <td style="text-align: center;">
-                                    <?php if(!$row['defaultfield']){?>
-                                    <a class="btn grey delete" attr_id="<?php echo $row['id'];?>" data-toggle="modal"
-                                        href="#mdelete"> Delete <i class="fa fa-trash"></i></a>
-                                    <?php }?>
-                                </td>
-                            </tr>
-                            <?php
-                                    //}
-                                }
-                            ?>
-                        </tbody>
-                    </table>
+
+    <section>
+        <div class="portlet light bordered">
+            <div class="portlet-body">
+                <div class="btn-group">
+                    <a class="btn sbold green add_new"> Add New <i class="fa fa-plus"></i></a>
                 </div>
+                <table class="table table-striped table-bordered table-hover table-checkable order-column"
+                    id="field_list">
+                    <thead>
+                        <tr>
+                            <th>Field ID</th>
+                            <th>Name</th>
+                            <th>Value</th>
+                            <th>Unit</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                            <th>Formula</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                            while ($row = mysqli_fetch_array($field_list, MYSQLI_ASSOC)) {
+                        ?>
+                        <tr class="odd gradeX">
+                            <td><?php echo $row['field_id'];?></td>
+                            <td><?php echo $row['field_label'];?></td>
+                            <td><?php echo $row['value'];?></td>
+                            <td><?php echo $row['unit'];?></td>
+                            <td><?php echo $row['type'] ? 'Dropdown' : 'Input';?></td>
+                            <td><?php echo $row['description'];?></td>
+                            <td><?php echo $row['formula'];?></td>
+                            <td>
+                                <a class="btn btn-success editformula"attr_id = "<?php echo $row['field_id'];?>">
+                                    <i class="fa fa-edit"></i> Edit Formula
+                                </a>
+                                <a class="btn btn-primary medit" class="edit_dialog" attr_id = "<?php echo $row['id'];?>">
+                                    <i class="fa fa-edit"></i> Edit
+                                </a>
+                                <?php if ($row['new_field']) { ?>
+                                <a class="btn grey delete" attr_id="<?php echo $row['id'];?>" data-toggle="modal" href="#mdelete">
+                                    <i class="fa fa-trash"></i> Delete
+                                </a>
+                                <?php } ?>
+                            </td>
+                        </tr>
+                        <?php
+                            }
+                        ?>
+                    </tbody>
+                </table>
             </div>
         </div>
-    </div>
+    </section>
 <!-- Add New start -->
     <div class="modal fade" id="formula" tabindex="-1" role="basic" aria-hidden="true">
         <div class="modal-dialog">
@@ -201,7 +201,7 @@
 <link href="./bootstrap/css/components.min.css" rel="stylesheet" id="style_components" type="text/css" />
 <link href="./bootstrap/css/plugins.min.css" rel="stylesheet" type="text/css" />
 <style type="text/css">
-    td {
+    th, td {
         text-align: center;
     }
 

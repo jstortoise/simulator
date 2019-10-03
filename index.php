@@ -21,11 +21,11 @@
                         </div>
                     </span>';
 
-                    $static = $field['static']?'readonly':'';
+                    $editable = $field['editable']?'readonly':'';
 
                     if(!$field['type'])
                     {
-                        echo '<input class="field-value" type="number" id="' . $field['field_id']  . '" value="' . $field['value'] . '"' . $static . '>';
+                        echo '<input class="field-value" type="number" id="' . $field['field_id']  . '" value="' . $field['value'] . '"' . $editable . '>';
                     }
                     else
                     {

@@ -36,15 +36,15 @@ CREATE TABLE `fields` (
   `unit` varchar(255) DEFAULT NULL,
   `type` int(11) DEFAULT 0,
   `description` longtext NOT NULL,
-  `defaultfield` tinyint(1) NOT NULL DEFAULT 0,
-  `static` tinyint(1) NOT NULL
+  `new_field` tinyint(1) NOT NULL DEFAULT 0,
+  `editable` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 
 --
 -- Dumping data for table `fields`
 --
 
-INSERT INTO `fields` (`id`, `field_id`, `field_label`, `value`, `unit`, `type`, `description`, `defaultfield`, `static`) VALUES
+INSERT INTO `fields` (`id`, `field_id`, `field_label`, `value`, `unit`, `type`, `description`, `defaultfield`, `editable`) VALUES
 (1, 'f7', 'Type de contrat', 'CDI', NULL, 1, 'sdasd', 1, 0),
 (2, 'f8', 'feuille de paye', '30', '€', 0, '', 1, 1),
 (3, 'f9', 'Mutuelle', '20,30,40', '€', 1, 'testing', 1, 0),
