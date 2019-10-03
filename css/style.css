@@ -75,7 +75,9 @@ select {
   flex-basis: 25%;
   padding: 2px 5px;
 }
-
+.field-name {
+    display: inherit;
+}
 .field select.field-value, .field input.field-value {
   padding: 5px 5px;
   width: 70px;
@@ -224,4 +226,30 @@ select {
   .content-col-right .field:last-child {
     margin-top: 15px;
   }
+}
+
+.tooltipcontainer
+{
+  z-index: 2 !important;
+  background-color: gray;
+  color: white;
+  padding: 5px;
+  border-radius: 5px;
+  /* opacity: 0; */
+  display: none;
+  position: absolute;
+  -webkit-transition: opacity 0.5s;
+  -moz-transition: opacity 0.5s;
+  -ms-transition: opacity 0.5s;
+  -o-transition: opacity 0.5s;
+  transition: opacity 0.5s;
+}
+
+.hover
+{
+  margin-right: 34px !important;
+    position: relative;
+    /* top: 50px; */
+    left: 5px;
+    right: 5px;
 }
