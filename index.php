@@ -205,7 +205,6 @@
             $(this).parent().find('.tooltipcontainer').eq(0).hide();
         });
 
-        console.log('fomulas', formulas);
         computeValue();
 
         function computeValue() {
@@ -228,40 +227,9 @@
 
             var f26 = 1, f5, f12, f32, f33, f27, f30, f17, f31, f25;
 
-            // var f5 = f1 * (1 - f4);
-            // var f12 = f5 * 5;
-            // var f32 = f5 - f19 - f21;
-        
-            // var f33 = (f32 * (f2 - f3)) / 12;
-            // var f26 = 1;
-            // var f27 = f26 * 400;
-        
-            // var f30 =
-            //     (f33 - f8 - f9 - f10 - f11 - f12 - f13 - f14 - f15 - f16 - f27) /
-            //     (1 + 0.12 + f24);
-        
-            // var f17 = 0.12 * f30;
-        
-            // var f31 = f33 - f8 - f9 - f10 - f11 - f12 - f13 - f14 - f15 - f16 - f17 - f27;
-        
-            // var f25 = f30 * f24; // tinh gia tri f25 phai co f30
-        
-            // var f34 = (100 * (f31 - f6)) / f6;
             var index = 0;
             while (index <= formulas.length) {
                 index++;
-                // console.log('===============================================================');
-                // console.log('f8', f8);
-                // console.log('f9', f9);
-                // console.log('f10', f10);
-                // console.log('f11', f11);
-                // console.log('f12', f12);
-                // console.log('f13', f13);
-                // console.log('f14', f14);
-                // console.log('f15', f15);
-                // console.log('f16', f16);
-                // console.log('f17', f17);
-                // console.log('f24', f24);
                 formulas.forEach(function(obj) {
                     try {
                         var ret = null;
@@ -276,12 +244,6 @@
                 });
             }
 
-            // $("#f5").val(f5);
-            // $("#f12").val(f12);
-            // $("#f17").html(f17);
-            // $("#f32").html(f32);
-            // $("#f30").html(f30);
-            // $("#f31").html(f31);
             $("#f34-value").html(`${f34}%`);
             if (f34 > 0) {
                 $("#f34-text").html(
