@@ -1,4 +1,32 @@
 $(function () {
+	function csrfToken() {
+		var meta = document.querySelector('meta[name="csrf-token"]');
+		return meta ? meta.getAttribute('content') : '';
+	}
+
+	$.ajaxSetup({
+		beforeSend: function (xhr) {
+			xhr.setRequestHeader('X-CSRF-Token', csrfToken());
+		}
+	});
+
+	function withCsrf(data) {
+		data.csrf_token = csrfToken();
+		return data;
+	}
+
+	function parseResponse(res) {
+		return typeof res === 'string' ? JSON.parse(res) : res;
+	}
+
+	function appendValueItem(value) {
+		var span = $('<span class="item" style="margin-right:10px;"></span>');
+		span.attr('itemvalue', value);
+		span.text(value);
+		span.append('<i class="fa fa-times-circle delete_value" style="margin-left:10px;"></i>');
+		$('.value_container').append(span);
+	}
+
 	function init() {
 		$('#medit').find('input').each(function () {
 			$(this).val('');
@@ -39,7 +67,7 @@ $(function () {
 		});
 
 		if (value_array.indexOf(value) == -1) {
-			$('.value_container').append('<span class="item" itemvalue="' + value + '" style="margin-right:10px;">' + value + '<i class="fa fa-times-circle delete_value" style="margin-left:10px;"></i></span>');
+			appendValueItem(value);
 		}
 
 		$('.value_edit').val('');
@@ -73,7 +101,7 @@ $(function () {
 		$.ajax({
 			url: 'editsave.php',
 			type: 'POST',
-			data: {
+			data: withCsrf({
 				action: action,
 				data: {
 					field_label: name,
@@ -84,9 +112,9 @@ $(function () {
 					description: description,
 					value: value
 				}
-			},
+			}),
 			success: function (res) {
-				res = JSON.parse(res);
+				res = parseResponse(res);
 				if (res.success) {
 					window.location.reload();
 				}
@@ -102,9 +130,9 @@ $(function () {
 		$.ajax({
 			url: 'getdata.php',
 			type: 'POST',
-			data: { action: 'autofieldid' },
+			data: withCsrf({ action: 'autofieldid' }),
 			success: function (res) {
-				res = JSON.parse(res);
+				res = parseResponse(res);
 				init();
 				$('.field_id').val(res.fieldid);
 				$('.change').attr('attr_id', '');
@@ -117,7 +145,7 @@ $(function () {
 		$.ajax({
 			url: 'data.php',
 			type: 'post',
-			data: { name_add: $('.name_add').val(), value_add: $('.value_add').val(), unit_add: $('.unit_add').val(), type_add: $('.type_add').val(), description_add: $('.description_add').val() },
+			data: withCsrf({ name_add: $('.name_add').val(), value_add: $('.value_add').val(), unit_add: $('.unit_add').val(), type_add: $('.type_add').val(), description_add: $('.description_add').val() }),
 			success: function (res) {
 				window.location.reload();
 			}
@@ -128,9 +156,9 @@ $(function () {
 		$.ajax({
 			url: 'getdata.php',
 			type: 'post',
-			data: { edit_id: $(this).attr('attr_id') },
+			data: withCsrf({ edit_id: $(this).attr('attr_id') }),
 			success: function (res) {
-				var data = JSON.parse(res);
+				var data = parseResponse(res);
 
 				init();
 				$('.value_container').html('');
@@ -146,10 +174,10 @@ $(function () {
 				if (data.type == '0') {
 					$('.value_edit').val(data.value);
 				} else {
-					var valuearray = data.value.split(',');
+					var valuearray = String(data.value || '').split(',');
 
-					for (item in valuearray) {
-						$('.value_container').append('<span class="item" itemvalue="' + valuearray[item] + '" style="margin-right:10px;">' + valuearray[item] + '<i class="fa fa-times-circle delete_value" style="margin-left:10px;"></i></span>')
+					for (var itemIndex = 0; itemIndex < valuearray.length; itemIndex++) {
+						appendValueItem(valuearray[itemIndex]);
 					}
 				}
 
@@ -166,10 +194,10 @@ $(function () {
 		$.ajax({
 			url: 'getdata.php',
 			type: 'POST',
-			data: { action: 'getformular', fieldid: fieldid },
+			data: withCsrf({ action: 'getformular', fieldid: fieldid }),
 			success: function (res) {
 				if (res) {
-					res = JSON.parse(res);
+					res = parseResponse(res);
 					if (res && res.formula) {
 						$('.formula_desc').val(res.formula);
 					} else {
@@ -191,11 +219,13 @@ $(function () {
 		$.ajax({
 			url: 'editsave.php',
 			type: 'POST',
-			data: { action: 'updateformula', field_id: fieldid, formula: formula },
+			data: withCsrf({ action: 'updateformula', field_id: fieldid, formula: formula }),
 			success: function (res) {
-				res = JSON.parse(res);
+				res = parseResponse(res);
 				if (res.success) {
 					$('#formula').modal('hide');
+				} else if (res.error) {
+					window.alert(res.error);
 				}
 			}
 		});
@@ -210,7 +240,7 @@ $(function () {
 		$.ajax({
 			url: 'delete.php',
 			type: 'post',
-			data: { delete_id: $(this).attr('attr_id') },
+			data: withCsrf({ delete_id: $(this).attr('attr_id') }),
 			success: function (res) {
 				window.location.reload();
 			}

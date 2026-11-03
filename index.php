@@ -1,46 +1,54 @@
 <?php
     include('session.php');
 
-    if ($login_role == 0) {
-        header("location:admin.php");
-        die();
+    if ((int)$login_role !== 1) {
+        header('Location: admin.php');
+        exit;
     }
 
     $field_sql = mysqli_query($db, "SELECT * FROM fields");
     $fields = array();
-    while ($row = mysqli_fetch_array($field_sql, MYSQLI_ASSOC)) {
-        $fields[$row['field_id']] = $row;
+    if ($field_sql) {
+        while ($row = mysqli_fetch_assoc($field_sql)) {
+            if (is_safe_field_id($row['field_id'])) {
+                $fields[$row['field_id']] = $row;
+            }
+        }
     }
 
     $formula_sql = mysqli_query($db, "SELECT * FROM formulas");
 
     function display($field) {
-        echo '
-            <div class="field">
-                <span class="field-name">'
-                    .$field['field_label'] .
-                    '<div class="hover">
-                        <i class="fa fa-info-circle tooltip"></i>
-                        <div class="tooltipcontainer">' .  $field['description'] . '</div>
-                    </div>
-                </span>';
+        if (!is_array($field)) {
+            return;
+        }
+        $fieldId = is_safe_field_id(isset($field['field_id']) ? $field['field_id'] : '') ? $field['field_id'] : '';
+        $label = h(isset($field['field_label']) ? $field['field_label'] : '');
+        $description = h(isset($field['description']) ? $field['description'] : '');
+        $value = h(isset($field['value']) ? $field['value'] : '');
+        $unit = h(isset($field['unit']) ? $field['unit'] : '');
+        $readonly = !empty($field['editable']) ? '' : ' readonly';
 
-        $editable = $field['editable'] ? '' : 'readonly';
+        echo '<div class="field">';
+        echo '<span class="field-name">' . $label;
+        echo '<div class="hover"><i class="fa fa-info-circle tooltip"></i>';
+        echo '<div class="tooltipcontainer">' . $description . '</div></div></span>';
 
-        if (!$field['type']) {
-            echo '<input class="field-value" type="number" id="' . $field['field_id']  . '" value="' . $field['value'] . '"' . $editable . '>';
+        if ($fieldId === '') {
+            echo '<input class="field-value" type="text" value="" disabled>';
+        } else if (empty($field['type'])) {
+            echo '<input class="field-value" type="number" id="' . h($fieldId) . '" value="' . $value . '"' . $readonly . '>';
         } else {
-            $valuearray = preg_split('/,/', $field['value']);
-            echo '<select id="' . $field['field_id'] . '" class="field-value">';
-            foreach ($valuearray as $key => $value) {
-                echo '<option value="' . $value . '">' . $value . '</option>';
+            echo '<select id="' . h($fieldId) . '" class="field-value">';
+            $parts = explode(',', isset($field['value']) ? (string)$field['value'] : '');
+            foreach ($parts as $option) {
+                $option = h($option);
+                echo '<option value="' . $option . '">' . $option . '</option>';
             }
-                
             echo '</select>';
         }
 
-        echo '<span class="unit">' . $field['unit'] . '</span>
-            </div>';
+        echo '<span class="unit">' . $unit . '</span></div>';
     }
 
     function showNewFields($fields) {
@@ -52,18 +60,31 @@
     }
 ?>
 
+<?php
+    $safeFormulas = array();
+    if ($formula_sql) {
+        while ($row = mysqli_fetch_assoc($formula_sql)) {
+            $formulaFieldId = isset($row['field_id']) ? $row['field_id'] : '';
+            $formula = isset($row['formula']) ? $row['formula'] : '';
+            if (is_safe_field_id($formulaFieldId) && is_safe_formula($formula)) {
+                $safeFormulas[] = array(
+                    'field_id' => $formulaFieldId,
+                    'formula' => $formula,
+                );
+            }
+        }
+    }
+    render_page_head();
+?>
 <script>
-    var formulas = [];
-<?php while ($row = mysqli_fetch_array($formula_sql, MYSQLI_ASSOC)) { ?>
-    formulas.push({
-        field_id: "<?php echo $row['field_id'];?>",
-        formula: "<?php echo $row['formula'];?>"
-    });
-<?php } ?>
+    var formulas = <?php echo json_encode($safeFormulas, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
+    if (!Array.isArray(formulas)) {
+        formulas = [];
+    }
 </script>
 <body>
     <section>
-        <a href="./logout.php">Logout (<?php echo $login_user;?>)</a>
+        <a href="./logout.php">Logout (<?php echo h($login_user); ?>)</a>
     </section>
 
     <section id="header">
@@ -87,7 +108,7 @@
                                     Demande Spoc
                                     <div class="hover">
                                         <i class="fa fa-info-circle tooltip"></i>
-                                        <div class="tooltipcontainer"><?php echo $fields['f18']['description'];?></div>
+                                        <div class="tooltipcontainer"><?php echo h(isset($fields['f18']['description']) ? $fields['f18']['description'] : ''); ?></div>
                                     </div>
                                 </span>
                                 <label class="custom-checkbox">
@@ -100,7 +121,7 @@
                                     Recouvrement
                                     <div class="hover">
                                         <i class="fa fa-info-circle tooltip"></i>
-                                        <div class="tooltipcontainer"><?php echo $fields['f20']['description'];?></div>
+                                        <div class="tooltipcontainer"><?php echo h(isset($fields['f20']['description']) ? $fields['f20']['description'] : ''); ?></div>
                                     </div>
                                 </span>
                                 <label class="custom-checkbox">
@@ -164,8 +185,8 @@
                     </div>
                 </div>
 
-                <input type="hidden" id="f24" value="<?php echo $fields['f24'];?>" readonly />
-                <input type="hidden" id="f27" value="<?php echo $fields['f27'];?>" readonly />
+                <input type="hidden" id="f24" value="<?php echo h(isset($fields['f24']['value']) ? $fields['f24']['value'] : ''); ?>" readonly />
+                <input type="hidden" id="f27" value="<?php echo h(isset($fields['f27']['value']) ? $fields['f27']['value'] : ''); ?>" readonly />
             </div>
         </div>
     </section>
@@ -207,52 +228,176 @@
 
         computeValue();
 
-        function computeValue() {
-            var f1 = $("#f1").val() * 1;
-            var f2 = $("#f2").val() * 1;
-            var f3 = $("#f3").val() * 1;
-            var f4 = $("#f4").val() / 100 * 1;
-            var f6 = $("#f6").val() * 1;
-            var f19 = -f18 * 500;
-            var f21 = -f20 * 200;
-            var f8 = $("#f8").val() * 1;
-            var f9 = $("#f9").val() * 1;
-            var f10 = $("#f10").val() * 1;
-            var f11 = $("#f11").val() * 1;
-            var f13 = $("#f13").val() * 1;
-            var f14 = $("#f14").val() * 1;
-            var f15 = $("#f15").val() * 1;
-            var f16 = $("#f16").val() * 1;
-            var f24 = $("#f24").val() * 1;
+        function readNum(id) {
+            var el = document.getElementById(id);
+            if (!el) {
+                return NaN;
+            }
+            return el.value * 1;
+        }
 
-            var f26 = 1, f5, f12, f32, f33, f27, f30, f17, f31, f25;
+        function evaluateFormula(expr, vars) {
+            if (typeof expr !== 'string' || expr.length > 1000 || !/^[0-9+\-*/(). f]+$/.test(expr)) {
+                throw new Error('invalid formula');
+            }
+            var i = 0;
+
+            function skipSpaces() {
+                while (i < expr.length && expr.charAt(i) === ' ') {
+                    i++;
+                }
+            }
+
+            function parseExpr() {
+                var val = parseTerm();
+                while (true) {
+                    skipSpaces();
+                    var op = expr.charAt(i);
+                    if (op !== '+' && op !== '-') {
+                        break;
+                    }
+                    i++;
+                    var rhs = parseTerm();
+                    val = op === '+' ? val + rhs : val - rhs;
+                }
+                return val;
+            }
+
+            function parseTerm() {
+                var val = parseFactor();
+                while (true) {
+                    skipSpaces();
+                    var op = expr.charAt(i);
+                    if (op !== '*' && op !== '/') {
+                        break;
+                    }
+                    i++;
+                    var rhs = parseFactor();
+                    val = op === '*' ? val * rhs : val / rhs;
+                }
+                return val;
+            }
+
+            function parseFactor() {
+                skipSpaces();
+                var ch = expr.charAt(i);
+                if (ch === '+' || ch === '-') {
+                    i++;
+                    var signed = parseFactor();
+                    return ch === '-' ? -signed : signed;
+                }
+                if (ch === '(') {
+                    i++;
+                    var inner = parseExpr();
+                    skipSpaces();
+                    if (expr.charAt(i) !== ')') {
+                        throw new Error('paren');
+                    }
+                    i++;
+                    return inner;
+                }
+                if (ch === 'f') {
+                    i++;
+                    var start = i;
+                    while (i < expr.length && expr.charAt(i) >= '0' && expr.charAt(i) <= '9') {
+                        i++;
+                    }
+                    if (start === i) {
+                        throw new Error('field');
+                    }
+                    var name = 'f' + expr.slice(start, i);
+                    if (!Object.prototype.hasOwnProperty.call(vars, name) || vars[name] === undefined || vars[name] === null || isNaN(vars[name])) {
+                        throw new Error('unset');
+                    }
+                    return Number(vars[name]);
+                }
+                if ((ch >= '0' && ch <= '9') || ch === '.') {
+                    var startNum = i;
+                    var dots = 0;
+                    while (i < expr.length) {
+                        var c = expr.charAt(i);
+                        if (c >= '0' && c <= '9') {
+                            i++;
+                        } else if (c === '.') {
+                            dots++;
+                            if (dots > 1) {
+                                break;
+                            }
+                            i++;
+                        } else {
+                            break;
+                        }
+                    }
+                    var num = Number(expr.slice(startNum, i));
+                    if (startNum === i || isNaN(num)) {
+                        throw new Error('num');
+                    }
+                    return num;
+                }
+                throw new Error('token');
+            }
+
+            var result = parseExpr();
+            skipSpaces();
+            if (i !== expr.length || typeof result !== 'number') {
+                throw new Error('trailing');
+            }
+            return result;
+        }
+
+        function computeValue() {
+            var vars = {
+                f1: readNum('f1'),
+                f2: readNum('f2'),
+                f3: readNum('f3'),
+                f4: readNum('f4') / 100,
+                f6: readNum('f6'),
+                f8: readNum('f8'),
+                f9: readNum('f9'),
+                f10: readNum('f10'),
+                f11: readNum('f11'),
+                f13: readNum('f13'),
+                f14: readNum('f14'),
+                f15: readNum('f15'),
+                f16: readNum('f16'),
+                f24: readNum('f24'),
+                f18: f18 * 1,
+                f20: f20 * 1,
+                f26: 1,
+                f19: -f18 * 500,
+                f21: -f20 * 200
+            };
 
             var index = 0;
             while (index <= formulas.length) {
                 index++;
-                formulas.forEach(function(obj) {
+                formulas.forEach(function (obj) {
+                    if (!obj || !/^f\d{1,6}$/.test(obj.field_id)) {
+                        return;
+                    }
+                    var current = vars[obj.field_id];
+                    if (!(current === undefined || isNaN(current))) {
+                        return;
+                    }
                     try {
-                        var ret = null;
-                        eval (`ret = ${obj.field_id}`);
-                        if (isNaN(ret) || ret == undefined) {
-                            eval(`${obj.field_id}=${obj.formula};`);
-                            eval(`$("#${obj.field_id}").val(${obj.field_id});`);
+                        var result = evaluateFormula(obj.formula, vars);
+                        vars[obj.field_id] = result;
+                        var input = document.getElementById(obj.field_id);
+                        if (input) {
+                            input.value = result;
                         }
                     } catch (e) {
-                        console.log(e);
                     }
                 });
             }
 
-            $("#f34-value").html(`${f34}%`);
-            if (f34 > 0) {
-                $("#f34-text").html(
-                    `Contacter nous, si vous êtes intérés pour avoir ${f34}% d'augmentation`
-                );
-            } else {
-                $("#f34-text").html(
-                    `Votre salaire actuelle semble optimisé par rapport aux services attendues de votre employeyur`
-                );
+            var f34 = vars.f34;
+            if (typeof f34 === 'number' && !isNaN(f34)) {
+                if (f34 > 0) {
+                    $('#f34-text').text("Contacter nous, si vous êtes intérés pour avoir " + f34 + "% d'augmentation");
+                } else {
+                    $('#f34-text').text('Votre salaire actuelle semble optimisé par rapport aux services attendues de votre employeyur');
+                }
             }
         }
 

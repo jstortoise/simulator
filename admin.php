@@ -1,32 +1,49 @@
 <?php
     include('session.php');
-    if ($login_role == 1) {
-        header("location:index.php");
-        die();
+    if ((int)$login_role !== 0) {
+        header('Location: index.php');
+        exit;
     }
 
-    $result = '';
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        foreach ($_POST as $key => $value) {
-            //do something
-            $sql = "UPDATE fields SET value='$value' WHERE type=0 AND field_id='$key'";
-            if (mysqli_query($db, $sql) !== TRUE) {
-                echo "An error occured";
+    $notice = '';
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        if (!request_csrf_ok()) {
+            $notice = 'Invalid request.';
+        } else {
+            $stmt = db_prepare('UPDATE fields SET value = ? WHERE type = 0 AND field_id = ?');
+            if (!$stmt) {
+                $notice = 'An error occurred';
+            } else {
+                foreach ($_POST as $key => $value) {
+                    if ($key === 'csrf_token' || !is_safe_field_id($key) || clean_text($value, 255) === null) {
+                        continue;
+                    }
+                    mysqli_stmt_bind_param($stmt, 'ss', $value, $key);
+                    if (!mysqli_stmt_execute($stmt)) {
+                        $notice = 'An error occurred';
+                    }
+                }
+                mysqli_stmt_close($stmt);
+                if ($notice === '') {
+                    $notice = 'Successfully updated';
+                }
             }
         }
-        echo "Successfully updated";
     }
-    $field_list = mysqli_query($db, "SELECT a.*, b.formula FROM fields a LEFT JOIN formulas b ON a.field_id = b.field_id ORDER BY field_id DESC");
-
+    $field_list = mysqli_query($db, 'SELECT a.id, a.field_id, a.field_label, a.value, a.unit, a.type, a.editable, a.new_field, a.description, b.formula FROM fields a LEFT JOIN formulas b ON a.field_id = b.field_id ORDER BY field_id DESC');
+    render_page_head();
 ?>
 
 <body>
     <section>
-        <a href="./logout.php">Logout (<?php echo $login_user;?>)</a>
+        <a href="./logout.php">Logout (<?php echo h($login_user); ?>)</a>
     </section>
 
     <section>
         <h1>Admin Panel</h1>
+        <?php if ($notice !== '') { ?>
+        <p><?php echo h($notice); ?></p>
+        <?php } ?>
     </section>
 
     <section>
@@ -53,33 +70,35 @@
                     </thead>
                     <tbody>
                         <?php
-                            while ($row = mysqli_fetch_array($field_list, MYSQLI_ASSOC)) {
+                            if ($field_list) {
+                            while ($row = mysqli_fetch_assoc($field_list)) {
                         ?>
                         <tr class="odd gradeX">
-                            <td><?php echo $row['field_id'];?></td>
-                            <td><?php echo $row['field_label'];?></td>
-                            <td><?php echo $row['value'];?></td>
-                            <td><?php echo $row['unit'];?></td>
-                            <td><?php echo $row['type'] ? 'Dropdown' : 'Input';?></td>
-                            <td><?php echo $row['editable'] ? 'YES' : 'NO';?></td>
-                            <td><?php echo $row['new_field'] ? 'YES' : 'NO';?></td>
-                            <td><?php echo $row['description'];?></td>
-                            <td><?php echo $row['formula'];?></td>
+                            <td><?php echo h($row['field_id']); ?></td>
+                            <td><?php echo h($row['field_label']); ?></td>
+                            <td><?php echo h($row['value']); ?></td>
+                            <td><?php echo h($row['unit']); ?></td>
+                            <td><?php echo $row['type'] ? 'Dropdown' : 'Input'; ?></td>
+                            <td><?php echo $row['editable'] ? 'YES' : 'NO'; ?></td>
+                            <td><?php echo $row['new_field'] ? 'YES' : 'NO'; ?></td>
+                            <td><?php echo h($row['description']); ?></td>
+                            <td><?php echo h($row['formula']); ?></td>
                             <td>
-                                <a class="btn btn-success editformula"attr_id = "<?php echo $row['field_id'];?>">
+                                <a class="btn btn-success editformula" attr_id="<?php echo h($row['field_id']); ?>">
                                     <i class="fa fa-edit"></i> Edit Formula
                                 </a>
-                                <a class="btn btn-primary medit" class="edit_dialog" attr_id = "<?php echo $row['id'];?>">
+                                <a class="btn btn-primary medit" class="edit_dialog" attr_id="<?php echo (int)$row['id']; ?>">
                                     <i class="fa fa-edit"></i> Edit
                                 </a>
                                 <?php if ($row['new_field']) { ?>
-                                <a class="btn grey delete" attr_id="<?php echo $row['id'];?>" data-toggle="modal" href="#mdelete">
+                                <a class="btn grey delete" attr_id="<?php echo (int)$row['id']; ?>" data-toggle="modal" href="#mdelete">
                                     <i class="fa fa-trash"></i> Delete
                                 </a>
                                 <?php } ?>
                             </td>
                         </tr>
                         <?php
+                            }
                             }
                         ?>
                     </tbody>

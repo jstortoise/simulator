@@ -112,7 +112,7 @@ CREATE TABLE `users`  (
 -- ----------------------------
 -- Records of users
 -- ----------------------------
-INSERT INTO `users` VALUES ('admin', 'admin', '0');
-INSERT INTO `users` VALUES ('user', 'user', '1');
+INSERT INTO `users` VALUES ('admin', '$2y$10$eeACLOE/P1VlYTLTF7b5p../BsbL7F1HPhvRBp.rkRwlQaJ5PQ0Ee', '0');
+INSERT INTO `users` VALUES ('user', '$2y$10$wSLG3C4jlUaGiJkjit7e..kPVd2hl4PhM62yU.lbxJTP7jbLMP22m', '1');
 
 SET FOREIGN_KEY_CHECKS = 1;
